@@ -206,6 +206,8 @@ class CLIInterface:
                 except KeyboardInterrupt:
                     print("\n\nInterrupted by user.")
                     break
+                except EOFError:
+                    raise
                 except Exception as e:
                     print(f"\n❌ Error: {e}")
                     print("Please try again or type '/help' for commands.\n")

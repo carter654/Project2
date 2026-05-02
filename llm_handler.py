@@ -26,7 +26,7 @@ class LLMGenerator(ILLMGenerator):
         self.model_name = model_name
         print(f"Loading LLM model: {model_name}")
         self.generator = pipeline(
-            "text-generation",
+            "text2text-generation",
             model=model_name,
             device=-1,
         )
@@ -42,21 +42,27 @@ class LLMGenerator(ILLMGenerator):
     ) -> str:
         from transformers import GenerationConfig, set_seed  # lazy import
         set_seed(42)
+
+        tokenizer = self.generator.tokenizer
+        model_max = getattr(tokenizer, "model_max_length", 512)
+        token_ids = tokenizer.encode(prompt)
+        if len(token_ids) > model_max:
+            # Keep the tail (query + "Answer:" instruction); drop oldest context.
+            token_ids = token_ids[-model_max:]
+            prompt = tokenizer.decode(token_ids, skip_special_tokens=True)
+
         generation_config = GenerationConfig(
             max_new_tokens=max_length,
             temperature=temperature,
             top_p=top_p,
             do_sample=True,
             num_return_sequences=1,
-            pad_token_id=self.generator.tokenizer.eos_token_id,
         )
         output = self.generator(
             prompt,
             generation_config=generation_config,
-            return_full_text=True,
         )
-        generated_text = output[0]["generated_text"]
-        return generated_text[len(prompt):].strip()
+        return output[0]["generated_text"].strip()
 
 
 class PromptBuilder:
