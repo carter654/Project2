@@ -26,7 +26,7 @@ class LLMGenerator(ILLMGenerator):
         self.model_name = model_name
         print(f"Loading LLM model: {model_name}")
         self.generator = pipeline(
-            "text2text-generation",
+            "text-generation",
             model=model_name,
             device=-1,
         )
@@ -51,16 +51,20 @@ class LLMGenerator(ILLMGenerator):
             token_ids = token_ids[-model_max:]
             prompt = tokenizer.decode(token_ids, skip_special_tokens=True)
 
+        pad_token_id = getattr(self.generator.tokenizer, "pad_token_id", None) \
+            or self.generator.tokenizer.eos_token_id
         generation_config = GenerationConfig(
             max_new_tokens=max_length,
             temperature=temperature,
             top_p=top_p,
             do_sample=True,
             num_return_sequences=1,
+            pad_token_id=pad_token_id,
         )
         output = self.generator(
             prompt,
             generation_config=generation_config,
+            return_full_text=False,
         )
         return output[0]["generated_text"].strip()
 
