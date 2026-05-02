@@ -6,7 +6,7 @@ User-interactive command-line interface for querying the RAG system.
 from typing import List, Tuple
 from rag_system import create_rag_system, RAGSystem
 from llm_handler import create_generator, RAGGenerator
-from config import DEBUG_MODE
+from config import DEBUG_MODE, TOP_K
 
 
 class CLIInterface:
@@ -153,7 +153,7 @@ class CLIInterface:
         self.last_query = user_query
         
         # Retrieve relevant chunks
-        retrieved = self.rag_system.retrieve(user_query, top_k=5)
+        retrieved = self.rag_system.retrieve(user_query, top_k=TOP_K)
         
         if not retrieved:
             print("\n❌ No relevant documents found for your query.\n")

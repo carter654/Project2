@@ -35,7 +35,7 @@ TOP_K = 2  # Number of nearest neighbors to retrieve
 SIMILARITY_THRESHOLD = 0.3  # Minimum similarity score to consider a result relevant
 
 # LLM Configuration
-LLM_MODEL = "google/flan-t5-base"  # HuggingFace model for generation
+LLM_MODEL = "gpt2"  # HuggingFace model for generation
 LLM_MAX_LENGTH = 200  # Maximum tokens to generate per answer
 LLM_TEMPERATURE = 0.7  # Creativity level (0.0 = deterministic, 1.0 = creative)
 LLM_TOP_P = 0.95  # Nucleus sampling parameter

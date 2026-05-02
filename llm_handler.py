@@ -44,11 +44,12 @@ class LLMGenerator(ILLMGenerator):
         set_seed(42)
 
         tokenizer = self.generator.tokenizer
-        model_max = getattr(tokenizer, "model_max_length", 512)
+        model_max = getattr(self.generator.model.config, "n_positions", None) \
+            or getattr(tokenizer, "model_max_length", 1024)
+        max_prompt_tokens = max(1, model_max - max_length)
         token_ids = tokenizer.encode(prompt)
-        if len(token_ids) > model_max:
-            # Keep the tail (query + "Answer:" instruction); drop oldest context.
-            token_ids = token_ids[-model_max:]
+        if len(token_ids) > max_prompt_tokens:
+            token_ids = token_ids[-max_prompt_tokens:]
             prompt = tokenizer.decode(token_ids, skip_special_tokens=True)
 
         pad_token_id = getattr(self.generator.tokenizer, "pad_token_id", None) \
